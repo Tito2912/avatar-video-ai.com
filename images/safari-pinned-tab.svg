@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Monochrome shape for Safari pinned tabs. Safari will color it via the link color attribute. -->
+  <path d="M180 146 L180 366 L366 256 Z" fill="#000000"/>
+</svg>

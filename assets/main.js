@@ -1,0 +1,517 @@
+/* assets/main.js */
+/*
+  Avatar Video AI — App script
+  - CMP-lite (Consent Mode v2 semantics) + GA4 after consent (EU/CNIL)
+  - YouTube Lite (click-to-load, nocookie)
+  - Mobile menu (accessible)
+  - Language suggestion (non-blocking, cached 30d)
+  - Newsletter → Google Sheets (graceful until keys/URL provided)
+  - UTM persistence (90d) + inject on newsletter
+  - Engagement events (affiliate_click, cta_hero_click, video_start, video_complete, newsletter_submit, scroll_50)
+  - Optional sitemap ping (Bing) as fallback (post-build IndexNow remains the primary approach)
+*/
+
+(() => {
+  'use strict';
+
+  /* =========================
+     Constants / Config
+     ========================= */
+  const GA_MEASUREMENT_ID = 'G-VWL0HBYRC3';
+  const PROD_HOST = 'avatar-video-ai.com';
+  const CONSENT_LS_KEY = 'ava_consent_v2';
+  const CONSENT_MAX_AGE_DAYS = 395; // ≈13 months (CNIL)
+  const LANG_HINT_LS_KEY = 'ava_lang_hint_ts';
+  const LANG_HINT_TTL_DAYS = 30;
+  const UTM_LS_KEY = 'ava_utm_cache';
+  const UTM_TTL_DAYS = 90;
+  const SITEMAP_PING_LS_KEY = 'ava_bing_ping_ts';
+  const SITEMAP_PING_TTL_DAYS = 3;
+  const isFrench = location.pathname.startsWith('/fr/');
+  const now = Date.now();
+
+  /* =========================
+     Utilities
+     ========================= */
+  const qs = (sel, root = document) => root.querySelector(sel);
+  const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const on = (el, ev, cb, opts) => el && el.addEventListener(ev, cb, opts);
+  const off = (el, ev, cb, opts) => el && el.removeEventListener(ev, cb, opts);
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const days = d => d * 24 * 60 * 60 * 1000;
+  const inEU = true; // site targeted to EU users; no geo-IP redirection used
+
+  function getLS(key, fallback = null) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+  }
+  function setLS(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+  function removeLS(key) {
+    try { localStorage.removeItem(key); } catch {}
+  }
+
+  function parseUTM(url = location.href) {
+    const u = new URL(url);
+    const keep = {};
+    for (const [k, v] of u.searchParams.entries()) {
+      const kk = k.toLowerCase();
+      if (kk.startsWith('utm_') || kk === 'gclid' || kk === 'fbclid' || kk === 'twclid' || kk === 'ttclid') {
+        keep[kk] = v;
+      }
+    }
+    return keep;
+  }
+
+  function persistUTM() {
+    const cached = getLS(UTM_LS_KEY);
+    const fresh = parseUTM();
+    let data = cached && (now - cached.ts) < days(UTM_TTL_DAYS) ? cached.data : {};
+    data = { ...data, ...fresh };
+    if (Object.keys(data).length) {
+      setLS(UTM_LS_KEY, { ts: now, data });
+    }
+  }
+
+  function utmData() {
+    const cached = getLS(UTM_LS_KEY);
+    if (cached && (now - cached.ts) < days(UTM_TTL_DAYS)) return cached.data;
+    return {};
+  }
+
+  /* =========================
+     CMP-lite & GA4 (post-consent)
+     ========================= */
+  // Buffer gtag calls until GA is loaded
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  window.gtag = gtag; // expose
+
+  // Consent state helpers
+  function readConsent() {
+    const saved = getLS(CONSENT_LS_KEY);
+    if (!saved) return null;
+    if ((now - saved.ts) > days(CONSENT_MAX_AGE_DAYS)) {
+      removeLS(CONSENT_LS_KEY);
+      return null;
+    }
+    return saved;
+  }
+  function saveConsent(analyticsGranted) {
+    setLS(CONSENT_LS_KEY, { ts: now, analytics: !!analyticsGranted, ver: 2 });
+    document.documentElement.classList.add('consent-ready');
+    if (analyticsGranted) enableGA();
+  }
+
+  // Inject GA only if consent is granted
+  let gaInjected = false;
+  function enableGA() {
+    if (gaInjected) return;
+    gaInjected = true;
+
+    // Mark
+    document.documentElement.classList.add('has-ga4');
+
+    // Load gtag.js
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_MEASUREMENT_ID)}`;
+    document.head.appendChild(s);
+
+    // Init GA4
+    gtag('js', new Date());
+    // Consent Mode v2 (explicit granted)
+    gtag('consent', 'update', {
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      ad_storage: 'denied',
+      analytics_storage: 'granted',
+      functionality_storage: 'granted',
+      security_storage: 'granted'
+    });
+    gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true, transport_type: 'beacon' });
+  }
+
+  // Public consent manager
+  window.consentManager = {
+    acceptAnalytics(){
+      hideConsentBanner();
+      saveConsent(true);
+    },
+    rejectAnalytics(){
+      hideConsentBanner();
+      saveConsent(false);
+    },
+    open(){
+      showConsentBanner(true);
+    },
+    reset(){
+      removeLS(CONSENT_LS_KEY);
+      showConsentBanner(true);
+    }
+  };
+
+  // Render CMP banner
+  function showConsentBanner(force = false) {
+    const container = qs('#consent-banner');
+    if (!container) return;
+    // If consent already stored and not forcing, do nothing
+    if (!force && readConsent()) return;
+
+    const isFR = isFrench;
+    container.innerHTML = `
+      <div role="dialog" aria-labelledby="cmp-title" aria-describedby="cmp-desc">
+        <h2 id="cmp-title" class="tiny" style="margin:0 0 6px 0;">${isFR ? 'Respect de votre vie privée' : 'Your privacy'}</h2>
+        <p id="cmp-desc" class="tiny" style="margin:0 0 10px 0;">
+          ${isFR
+            ? `Nous utilisons uniquement des cookies nécessaires. L’analyse (Google Analytics 4) n’est chargée qu’après votre accord.`
+            : `We only use necessary cookies. Analytics (Google Analytics 4) loads only if you agree.`}
+        </p>
+        <div class="consent-actions">
+          <button class="btn btn-outline" data-cmp="reject">${isFR ? 'Tout refuser' : 'Reject'}</button>
+          <button class="btn btn-primary" data-cmp="accept">${isFR ? 'Accepter l’analyse' : 'Accept analytics'}</button>
+        </div>
+      </div>
+    `;
+    container.hidden = false;
+    container.setAttribute('aria-hidden', 'false');
+
+    const acceptBtn = qs('[data-cmp="accept"]', container);
+    const rejectBtn = qs('[data-cmp="reject"]', container);
+    on(acceptBtn, 'click', () => window.consentManager.acceptAnalytics());
+    on(rejectBtn, 'click', () => window.consentManager.rejectAnalytics());
+  }
+  function hideConsentBanner() {
+    const container = qs('#consent-banner');
+    if (!container) return;
+    container.hidden = true;
+    container.setAttribute('aria-hidden', 'true');
+  }
+
+  // Initial consent flow
+  (function initConsent(){
+    const stored = readConsent();
+    if (stored) {
+      document.documentElement.classList.add('consent-ready');
+      if (stored.analytics) enableGA();
+      return;
+    }
+    // No stored consent: show banner
+    showConsentBanner();
+  })();
+
+  /* =========================
+     Engagement events helper
+     ========================= */
+  function sendEvent(name, params = {}) {
+    try {
+      if (!gaInjected) return; // no GA until consent granted
+      gtag('event', name, params);
+    } catch {}
+  }
+
+  // Generic data-ev click tracking
+  qsa('[data-ev]').forEach(el => {
+    on(el, 'click', e => {
+      const name = el.getAttribute('data-ev');
+      const label = el.getAttribute('data-label') || el.getAttribute('href') || el.textContent?.trim();
+      sendEvent(name, { label });
+    });
+  });
+
+  // Affiliate link tracking (any HeyGen sponsored link)
+  qsa('a[rel~="sponsored"]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if (/heygen\.com/i.test(href)) {
+      on(a, 'click', () => sendEvent('affiliate_click', { label: href }));
+    }
+  });
+
+  // scroll_50 (once)
+  (function trackScroll50(){
+    let fired = false;
+    function handler() {
+      if (fired) return;
+      const scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+      if (scrolled >= 0.5) {
+        fired = true;
+        sendEvent('scroll_50');
+        off(window, 'scroll', handler);
+      }
+    }
+    on(window, 'scroll', handler, { passive: true });
+  })();
+
+  /* =========================
+     Mobile menu (accessible)
+     ========================= */
+  (function mobileMenu(){
+    const burger = qs('.burger');
+    const nav = qs('.nav');
+    if (!burger || !nav) return;
+
+    function open() {
+      nav.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+      document.documentElement.classList.add('nav-open');
+      // Close on outside click
+      on(document, 'click', outsideClose, true);
+      on(document, 'keydown', escClose);
+    }
+    function close() {
+      nav.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+      document.documentElement.classList.remove('nav-open');
+      off(document, 'click', outsideClose, true);
+      off(document, 'keydown', escClose);
+    }
+    function toggle() {
+      nav.classList.contains('is-open') ? close() : open();
+    }
+    function outsideClose(e) {
+      if (!nav.contains(e.target) && e.target !== burger) close();
+    }
+    function escClose(e) {
+      if (e.key === 'Escape') close();
+    }
+
+    on(burger, 'click', toggle);
+  })();
+
+  /* =========================
+     Language suggestion (non-blocking)
+     ========================= */
+  (function langSuggest(){
+    try {
+      const last = getLS(LANG_HINT_LS_KEY);
+      if (last && (now - last.ts) < days(LANG_HINT_TTL_DAYS)) return;
+
+      const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      const wantsFR = navLang.startsWith('fr');
+      const wantsEN = navLang.startsWith('en');
+
+      const bar = qs('#lang-suggest');
+      if (!bar) return;
+
+      let show = false;
+      if (!isFrench && wantsFR) show = true;
+      if (isFrench && wantsEN) show = true;
+      if (!show) return;
+
+      document.documentElement.classList.add('lang-hint');
+      bar.hidden = false;
+      const targetHref = isFrench ? '/' : '/fr/';
+      bar.innerHTML = isFrench
+        ? `Vous préférez la version <a href="/">anglaise</a> ?`
+        : `Prefer the <a href="/fr/">French</a> version?`;
+
+      // Cache hint display
+      setLS(LANG_HINT_LS_KEY, { ts: now });
+    } catch {}
+  })();
+
+  /* =========================
+     YouTube Lite (click-to-load, nocookie)
+     ========================= */
+  (function ytLite(){
+    const items = qsa('.yt-lite');
+    if (!items.length) return;
+
+    function thumbUrl(id) {
+      // hqdefault is OK; sddefault/maxres sometimes blocked; nocookie still uses i.ytimg.com
+      return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
+    }
+    function createIframe(id, title) {
+      const lang = isFrench ? 'fr' : 'en';
+      const iframe = document.createElement('iframe');
+      iframe.width = '560';
+      iframe.height = '315';
+      iframe.allow =
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      iframe.title = title || 'YouTube video';
+      iframe.src =
+        `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&hl=${lang}&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`;
+      iframe.setAttribute('loading', 'eager');
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      return iframe;
+    }
+
+    // Lazy-load YT API only upon first play (for completion tracking)
+    let ytApiLoaded = false;
+    function loadYTApi(cb) {
+      if (ytApiLoaded) { cb && cb(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.async = true;
+      window.onYouTubeIframeAPIReady = function(){ ytApiLoaded = true; cb && cb(); };
+      document.head.appendChild(s);
+    }
+
+    items.forEach(box => {
+      const id = box.getAttribute('data-videoid');
+      const title = box.getAttribute('data-title') || '';
+      if (!id) return;
+
+      // Set background thumbnail
+      const url = thumbUrl(id);
+      box.style.backgroundImage = `url("${url}")`;
+      box.style.backgroundSize = 'cover';
+      box.style.backgroundPosition = 'center';
+
+      const playBtn = qs('.yt-play', box);
+      on(playBtn || box, 'click', () => {
+        // Send start event
+        sendEvent('video_start', { label: id });
+
+        // Inject iframe
+        const iframe = createIframe(id, title);
+        box.innerHTML = ''; // clear play overlay
+        box.appendChild(iframe);
+
+        // Hook completion with YouTube API
+        loadYTApi(() => {
+          try {
+            const player = new YT.Player(iframe, {
+              events: {
+                onStateChange: e => {
+                  // 0 = ended
+                  if (e.data === 0) sendEvent('video_complete', { label: id });
+                }
+              }
+            });
+          } catch {}
+        });
+      }, { once: true });
+    });
+  })();
+
+  /* =========================
+     Newsletter (graceful)
+     ========================= */
+  (function newsletter(){
+    const form = qs('#newsletter-form');
+    if (!form) return;
+
+    const emailEl = qs('#email', form);
+    const hpEl = qs('#company', form); // honeypot
+    const note = qs('#newsletter-note', form);
+
+    const delay = clamp(700 + Math.random() * 600, 700, 1200);
+
+    on(form, 'submit', async (e) => {
+      e.preventDefault();
+      form.classList.remove('is-error', 'is-success');
+      note.textContent = isFrench ? 'Envoi…' : 'Sending…';
+
+      // Basic validation
+      const email = (emailEl.value || '').trim();
+      const bot = (hpEl && hpEl.value.trim().length > 0);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || bot) {
+        form.classList.add('is-error');
+        note.classList.add('error');
+        note.textContent = isFrench ? 'Email invalide.' : 'Invalid email.';
+        sendEvent('newsletter_submit', { success: false, reason: bot ? 'honeypot' : 'invalid_email' });
+        return;
+      }
+
+      // Wait anti-bot
+      await new Promise(r => setTimeout(r, delay));
+
+      // If Apps Script URL is not provided, gracefully inform
+      // You can set it by adding data-script-url and data-sheet-id attributes on the form
+      const scriptUrl = form.getAttribute('data-script-url') || '';
+      const sheetId = form.getAttribute('data-sheet-id') || '';
+
+      const payload = {
+        timestamp: new Date().toISOString(),
+        email,
+        page: location.pathname,
+        lang: isFrench ? 'fr' : 'en',
+        consent: true,
+        ...utmData()
+      };
+
+      if (!scriptUrl || !sheetId) {
+        console.info('[Newsletter] Missing Apps Script URL/Sheet ID. Payload:', payload);
+        form.classList.add('is-success');
+        note.classList.remove('error'); note.classList.add('success');
+        note.textContent = isFrench ? 'Merci ! Vous êtes bien inscrit (mode démo).' : 'Thanks! You are subscribed (demo mode).';
+        sendEvent('newsletter_submit', { success: true, demo: true });
+        form.reset();
+        return;
+      }
+
+      // Real submission (Apps Script expects JSON POST)
+      try {
+        const res = await fetch(scriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheetId, data: payload })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        form.classList.add('is-success');
+        note.classList.remove('error'); note.classList.add('success');
+        note.textContent = isFrench ? 'Merci ! Vérifiez votre boîte mail.' : 'Thanks! Please check your inbox.';
+        sendEvent('newsletter_submit', { success: true });
+        form.reset();
+      } catch (err) {
+        console.error('[Newsletter] Submit failed', err);
+        form.classList.add('is-error');
+        note.classList.add('error');
+        note.textContent = isFrench ? 'Erreur : réessayez plus tard.' : 'Error: please try again later.';
+        sendEvent('newsletter_submit', { success: false, reason: 'network' });
+      }
+    });
+  })();
+
+  /* =========================
+     Breadcrumbs (init ARIA if present)
+     ========================= */
+  (function breadcrumbs(){
+    const bc = qs('nav[aria-label="Breadcrumb"] ol, nav[aria-label="Breadcrumb"] ul');
+    if (!bc) return;
+    bc.setAttribute('role', 'list');
+    const items = qsa('li', bc);
+    items.forEach((li, idx) => {
+      const a = qs('a', li);
+      if (!a) return;
+      if (idx === items.length - 1) {
+        a.setAttribute('aria-current', 'page');
+        a.removeAttribute('href');
+      }
+    });
+  })();
+
+  /* =========================
+     Footer year
+     ========================= */
+  (function currentYear(){
+    const el = qs('#year');
+    if (el) el.textContent = String(new Date().getFullYear());
+  })();
+
+  /* =========================
+     UTM persist
+     ========================= */
+  persistUTM();
+
+  /* =========================
+     Optional: Fallback sitemap ping (Bing)
+     Primary IndexNow ping is handled by scripts/ping-indexnow.js post-build.
+     This runs client-side at most once every 3 days on production.
+     ========================= */
+  (function pingSitemapsFallback(){
+    if (location.hostname !== PROD_HOST) return;
+    const last = getLS(SITEMAP_PING_LS_KEY);
+    if (last && (now - last.ts) < days(SITEMAP_PING_TTL_DAYS)) return;
+    try {
+      const sitemap = `https://${PROD_HOST}/sitemap.xml`;
+      // Bing ping
+      fetch(`https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemap)}`, { mode: 'no-cors' })
+        .catch(()=>{});
+      setLS(SITEMAP_PING_LS_KEY, { ts: now });
+    } catch {}
+  })();
+
+})();

@@ -1,0 +1,89 @@
+# Netlify configuration — Avatar Video AI
+# Goals: security headers, strict CSP, long-term caching for static assets,
+# trailing slash policy, postbuild IndexNow ping.
+# Note: Set env var INDEXNOW_KEY in Netlify to enable IndexNow. The postbuild
+#       script will generate /indexnow-<KEY>.txt and ping api.indexnow.org.
+
+[build]
+  publish = "."
+  # Static site — no build step needed. We still run the IndexNow postbuild.
+  command = "node scripts/ping-indexnow.js || echo 'IndexNow skipped'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Trailing slash: keep directories with slash (e.g. /blog/), .html unchanged.
+trailingSlash = "always"
+
+############################
+# Security & Privacy Headers
+############################
+
+# Global security headers (all routes)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    # Minimal, privacy-first permissions policy
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), browsing-topics=()"
+    # Content Security Policy — allow only what we need for GA4 (after consent), Apps Script, reCAPTCHA (optional), and YouTube-nocookie.
+    # If you later enable Google Apps Script endpoint, add its exact origin to connect-src (e.g., https://script.google.com or your deployed URL).
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://translate.googleapis.com https://translate.google.com https://script.google.com https://script.googleusercontent.com https://www.gstatic.com https://www.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: https://i.ytimg.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://www.google.com/recaptcha/; media-src 'self' blob: https:"
+
+############################
+# Caching
+############################
+
+# Immutable long-term cache for static assets (add ?v=hash busting on updates)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/videos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Reasonable caching for XML/robots (easy to refresh)
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/sitemaps/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# HTML should be fresh (avoid over-caching)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=60"
+
+############################
+# (Optional) Diagnostics
+############################
+
+# Add this if you want to verify which CSP is active:
+# [[headers]]
+#   for = "/csp.txt"
+#   [headers.values]
+#     Content-Type = "text/plain; charset=utf-8"
+#     Cache-Control = "no-store"
+#     # Mirrors the same CSP as above for visibility
+#     Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://translate.googleapis.com https://translate.google.com https://script.google.com https://script.googleusercontent.com https://www.gstatic.com https://www.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: https://i.ytimg.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://www.google.com/recaptcha/; media-src 'self' blob: https:"

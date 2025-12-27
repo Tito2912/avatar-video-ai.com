@@ -1,0 +1,38 @@
+# Canonical domain → no language redirects (SEO-safe)
+# Primary: https://avatar-video-ai.com
+# NOTE: keep locale URLs crawlable; DO NOT redirect by IP/Accept-Language.
+
+# Force HTTPS + apex (no www)
+http://avatar-video-ai.com/*            https://avatar-video-ai.com/:splat     301!
+http://www.avatar-video-ai.com/*        https://avatar-video-ai.com/:splat     301!
+https://www.avatar-video-ai.com/*       https://avatar-video-ai.com/:splat     301!
+
+# Deduplicate index URLs (avoid /index.html variants being indexed)
+/index.html                             /                                       301!
+/blog/index.html                        /blog/                                  301!
+/fr/index.html                          /fr/                                    301!
+/fr/blog/index.html                     /fr/blog/                               301!
+
+# Optional: when production is live, point preview domains to the canonical.
+# Uncomment if desired (adjust your real preview host if needed).
+# https://*.netlify.app/*                 https://avatar-video-ai.com/:splat     301!
+
+# Serve extensionless privacy/legal/blog URLs as canonical and 301 the .html to them (prevents hreflang duplicates)
+/privacy-policy                         /privacy-policy.html                     200
+/privacy-policy.html                    /privacy-policy                          301!
+/legal-notice                           /legal-notice.html                       200
+/legal-notice.html                      /legal-notice                            301!
+/blog/heygen-ai-review                  /blog/heygen-ai-review.html              200
+/blog/heygen-ai-review.html             /blog/heygen-ai-review                   301!
+/blog/heygen-update-2025                /blog/heygen-update-2025.html            200
+/blog/heygen-update-2025.html           /blog/heygen-update-2025                 301!
+/fr/politique-de-confidentialite        /fr/politique-de-confidentialite.html    200
+/fr/politique-de-confidentialite.html   /fr/politique-de-confidentialite         301!
+/fr/mentions-legales                    /fr/mentions-legales.html                200
+/fr/mentions-legales.html               /fr/mentions-legales                     301!
+/fr/blog/avis-heygen-ai                 /fr/blog/avis-heygen-ai.html             200
+/fr/blog/avis-heygen-ai.html            /fr/blog/avis-heygen-ai                  301!
+/fr/blog/mise-a-jour-heygen-2025        /fr/blog/mise-a-jour-heygen-2025.html    200
+/fr/blog/mise-a-jour-heygen-2025.html   /fr/blog/mise-a-jour-heygen-2025         301!
+
+# No other redirects. Articles keep their .html; hubs keep trailing slash via netlify.toml.

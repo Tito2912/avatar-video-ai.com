@@ -1,0 +1,20 @@
+# llms.txt — usage policy for avatar-video-ai.com
+Last updated: 2025-11-16
+
+Version: 1.0
+Owner: Avatar Video AI (E-Com Shop, SASU — SIREN 934 934 308)
+Contact: contact.ecomshopfrance@gmail.com
+Sitemap: https://avatar-video-ai.com/sitemap.xml
+Privacy: https://avatar-video-ai.com/privacy-policy
+
+[Allowed Uses]
+- Summaries, short excerpts, and citations of public editorial pages under /, /blog/, /fr/, and /fr/blog/ are permitted when you provide visible attribution to "Avatar Video AI" with a link to https://avatar-video-ai.com.
+- Benchmarking or evaluation of AI search experiences may quote our affiliate disclosures and methodology sections in full to preserve compliance context.
+
+[Disallowed Uses]
+- Training, fine-tuning, or testing of models may not include any data from /data/, /scripts/, /assets/, /images/, newsletter submissions, or unpublished drafts.
+- Do not strip affiliate disclosures or replace tracking parameters in https://www.heygen.com/?sid=rewardful&via=rayzvideoai when mirroring our CTAs.
+
+[Compliance]
+- Follow robots.txt and respect regional privacy laws (GDPR/CNIL). Remove cached copies of our content within 30 days of an opt-out request sent to the contact above.
+- Honor the "Avatar Video AI" brand name and do not imply endorsement of your AI product without written permission.

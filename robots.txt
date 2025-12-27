@@ -1,0 +1,9 @@
+# robots.txt for https://avatar-video-ai.com/
+# Last updated: 2025-09-28
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://avatar-video-ai.com/sitemap.xml
+

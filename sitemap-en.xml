@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- EN Home (x-default) -->
+  <url>
+    <loc>https://avatar-video-ai.com/</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/"/>
+  </url>
+
+  <!-- Blog hub (EN) -->
+  <url>
+    <loc>https://avatar-video-ai.com/blog/</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/blog/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/blog/"/>
+  </url>
+
+  <!-- Blog article (EN) -->
+  <url>
+    <loc>https://avatar-video-ai.com/blog/heygen-ai-review</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/heygen-ai-review"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/blog/heygen-ai-review"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/blog/avis-heygen-ai"/>
+  </url>
+
+  <!-- Blog article (EN) - Update 2025 -->
+  <url>
+    <loc>https://avatar-video-ai.com/blog/heygen-update-2025</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/heygen-update-2025"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/blog/heygen-update-2025"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/blog/mise-a-jour-heygen-2025"/>
+  </url>
+
+  <!-- Legal notice (EN) -->
+  <url>
+    <loc>https://avatar-video-ai.com/legal-notice</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/legal-notice"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/legal-notice"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/mentions-legales"/>
+  </url>
+
+  <!-- Privacy policy (EN) -->
+  <url>
+    <loc>https://avatar-video-ai.com/privacy-policy</loc>
+    <lastmod>2025-03-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/politique-de-confidentialite"/>
+  </url>
+
+</urlset>

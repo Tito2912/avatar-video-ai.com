@@ -1,0 +1,23 @@
+{
+  "name": "Avatar Video AI",
+  "short_name": "AvatarAI",
+  "description": "Create talking avatar videos from text.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0EA5E9",
+  "theme_color": "#6366F1",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/avatar-video-ai-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
