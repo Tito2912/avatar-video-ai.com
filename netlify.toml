@@ -16,6 +16,19 @@
 trailingSlash = "always"
 
 ############################
+# Canonical Domain Redirects
+############################
+
+# Avoid redirect chains for `www` and HTTP by redirecting straight to the
+# canonical apex HTTPS host.
+[[redirects]]
+  from = "/*"
+  to = "https://avatar-video-ai.com/:splat"
+  status = 301
+  force = true
+  conditions = { Host = ["www.avatar-video-ai.com"] }
+
+############################
 # Security & Privacy Headers
 ############################
 

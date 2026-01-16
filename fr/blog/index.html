@@ -19,14 +19,14 @@
   <meta property="og:title" content="Blog — Guides, tests &amp; playbooks" />
   <meta property="og:description" content="Bonnes pratiques pour les vidéos avatar IA : tests, tutoriels et playbooks." />
   <meta property="og:url" content="https://avatar-video-ai.com/fr/blog/" />
-  <meta property="og:image" content="https://avatar-video-ai.com/images/capture-dashboard.png" />
+  <meta property="og:image" content="https://avatar-video-ai.com/images/capture-dashboard.jpg" />
   <meta property="og:locale" content="fr_FR" />
   <meta property="og:locale:alternate" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Blog — Guides, tests &amp; playbooks" />
   <meta name="twitter:description" content="Bonnes pratiques pour les vidéos avatar IA : tests, tutoriels et playbooks." />
-  <meta name="twitter:image" content="https://avatar-video-ai.com/images/capture-dashboard.png" />
+  <meta name="twitter:image" content="https://avatar-video-ai.com/images/capture-dashboard.jpg" />
 
   <!-- Icônes / Manifest -->
   <link rel="icon" href="/images/favicon.ico" sizes="any" />
@@ -149,7 +149,7 @@
             <a aria-label='Lire : Avis HeyGen (2025)' href='/fr/blog/avis-heygen-ai'>
               <picture>
                 <source srcset="/images/capture-dashboard.webp" type="image/webp" />
-                <img src="/images/capture-dashboard.png" width="3662" height="2022" alt="Capture du studio HeyGen utilisée dans le test" loading="lazy" decoding="async" />
+                <img src="/images/capture-dashboard.jpg" width="1400" height="773" alt="Capture du studio HeyGen utilisée dans le test" loading="lazy" decoding="async" />
               </picture>
             </a>
             <div style="padding:12px">
@@ -266,18 +266,29 @@
         "url": "https://avatar-video-ai.com/fr/blog/",
         "name": "Blog — Guides, tests & playbooks",
         "inLanguage": "fr",
-        "isPartOf": { "@id": "https://avatar-video-ai.com/#website" }
+        "isPartOf": { "@id": "https://avatar-video-ai.com/#website" },
+        "mainEntity": { "@id": "https://avatar-video-ai.com/fr/blog/#list" }
       },
       {
         "@type": "ItemList",
+        "@id": "https://avatar-video-ai.com/fr/blog/#list",
+        "name": "Articles du blog",
+        "itemListOrder": "https://schema.org/ItemListOrderAscending",
+        "numberOfItems": 1,
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
-            "url": "https://avatar-video-ai.com/fr/blog/avis-heygen-ai",
-            "name": "Avis HeyGen (2025) : test complet — avatars vidéo, doublage IA & traduction, fonctionnalités, limites, tarifs",
-            "image": "https://avatar-video-ai.com/images/capture-dashboard.png",
-            "datePublished": "2025-09-28"
+            "item": {
+              "@type": "BlogPosting",
+              "@id": "https://avatar-video-ai.com/fr/blog/avis-heygen-ai#post",
+              "url": "https://avatar-video-ai.com/fr/blog/avis-heygen-ai",
+              "headline": "Avis HeyGen (2025) : test complet — avatars vidéo, doublage IA & traduction, fonctionnalités, limites, tarifs",
+              "image": "https://avatar-video-ai.com/images/capture-dashboard.jpg",
+              "datePublished": "2025-09-28",
+              "inLanguage": "fr",
+              "isPartOf": { "@id": "https://avatar-video-ai.com/fr/blog/#page" }
+            }
           }
         ]
       },
