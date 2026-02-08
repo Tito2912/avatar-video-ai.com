@@ -5,7 +5,7 @@
 
   <!-- EN Home (x-default) -->
   <url>
-    <loc>https://avatar-video-ai.com/</loc>
+    <loc>https://avatar-video-ai.com/es/</loc>
     <lastmod>2026-01-24</lastmod>
     <changefreq>weekly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/"/>
@@ -18,7 +18,7 @@
 
   <!-- Blog hub (EN) -->
   <url>
-    <loc>https://avatar-video-ai.com/blog/</loc>
+    <loc>https://avatar-video-ai.com/es/blog/</loc>
     <lastmod>2025-03-02</lastmod>
     <changefreq>weekly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/"/>
@@ -31,7 +31,7 @@
 
   <!-- Blog article (EN) -->
   <url>
-    <loc>https://avatar-video-ai.com/blog/heygen-ai-review</loc>
+    <loc>https://avatar-video-ai.com/es/blog/heygen-ai-review</loc>
     <lastmod>2026-01-21</lastmod>
     <changefreq>monthly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/heygen-ai-review"/>
@@ -44,7 +44,7 @@
 
   <!-- Blog article (EN) - Update 2025 -->
   <url>
-    <loc>https://avatar-video-ai.com/blog/heygen-update-2025</loc>
+    <loc>https://avatar-video-ai.com/es/blog/heygen-update-2025</loc>
     <lastmod>2025-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/heygen-update-2025"/>
@@ -57,7 +57,7 @@
 
   <!-- Legal notice (EN) -->
   <url>
-    <loc>https://avatar-video-ai.com/legal-notice</loc>
+    <loc>https://avatar-video-ai.com/es/legal-notice</loc>
     <lastmod>2025-03-02</lastmod>
     <changefreq>yearly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/legal-notice"/>
@@ -70,7 +70,7 @@
 
   <!-- Privacy policy (EN) -->
   <url>
-    <loc>https://avatar-video-ai.com/privacy-policy</loc>
+    <loc>https://avatar-video-ai.com/es/privacy-policy</loc>
     <lastmod>2025-03-02</lastmod>
     <changefreq>yearly</changefreq>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/privacy-policy"/>

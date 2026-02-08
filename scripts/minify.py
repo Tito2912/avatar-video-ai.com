@@ -3,18 +3,38 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
 try:
-    from rcssmin import cssmin
-    from rjsmin import jsmin
-except ImportError as exc:  # pragma: no cover - informative exit
+    from rcssmin import cssmin  # type: ignore[import-not-found]
+    from rjsmin import jsmin  # type: ignore[import-not-found]
+except ImportError:  # pragma: no cover - optional dependency
     sys.stderr.write(
-        "Missing dependencies. Install them with:\n"
-        "  python3 -m pip install --user rcssmin rjsmin\n"
+        "Warning: optional dependencies missing (rcssmin, rjsmin).\n"
+        "Falling back to a lightweight minifier (less optimal).\n"
+        "To use the best minification, install:\n"
+        "  python3 -m pip install --user rcssmin rjsmin\n\n"
     )
-    raise
+
+    _CSS_COMMENT_RE = re.compile(r"/\\*.*?\\*/", flags=re.DOTALL)
+    _WS_RE = re.compile(r"\\s+")
+
+    def cssmin(text: str) -> str:  # type: ignore[no-redef]
+        # Simple, safe-ish CSS minifier: remove comments + collapse whitespace.
+        out = _CSS_COMMENT_RE.sub("", text)
+        out = _WS_RE.sub(" ", out)
+        out = re.sub(r"\\s*([{}:;,>+~])\\s*", r"\\1", out)
+        out = out.strip()
+        return out + ("\n" if out else "")
+
+    def jsmin(text: str) -> str:  # type: ignore[no-redef]
+        # Conservative JS “minifier”: trim lines + drop empty lines.
+        # (Avoids risky comment/string parsing without rjsmin.)
+        lines = [ln.strip() for ln in text.splitlines()]
+        out = "\n".join([ln for ln in lines if ln])
+        return out + ("\n" if out else "")
 
 
 def write_minified(src: Path, dest: Path, minify_func) -> None:
