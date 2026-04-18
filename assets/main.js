@@ -222,9 +222,16 @@
   // Affiliate link tracking (any HeyGen sponsored link)
   qsa('a[rel~="sponsored"]').forEach(a => {
     const href = a.getAttribute('href') || '';
-    if (/heygen\.com/i.test(href)) {
-      on(a, 'click', () => sendEvent('affiliate_click', { label: href }));
-    }
+    if (!/heygen\.com/i.test(href)) return;
+
+    // Avoid double-counting when the element already emits `affiliate_click` via data-ev.
+    const ev = (a.getAttribute('data-ev') || '').toLowerCase();
+    if (ev === 'affiliate_click') return;
+
+    on(a, 'click', () => {
+      const label = a.getAttribute('data-label') || href;
+      sendEvent('affiliate_click', { label });
+    });
   });
 
   // scroll_50 (once)

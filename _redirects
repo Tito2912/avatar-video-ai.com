@@ -12,6 +12,10 @@ https://www.avatar-video-ai.com/*       https://avatar-video-ai.com/:splat     3
 /blog/index.html                        /blog/                                  301!
 /fr/index.html                          /fr/                                    301!
 /fr/blog/index.html                     /fr/blog/                               301!
+/es/index.html                          /es/                                    301!
+/es/blog/index.html                     /es/blog/                               301!
+/de/index.html                          /de/                                    301!
+/de/blog/index.html                     /de/blog/                               301!
 
 # Optional: when production is live, point preview domains to the canonical.
 # Uncomment if desired (adjust your real preview host if needed).
@@ -35,4 +39,23 @@ https://www.avatar-video-ai.com/*       https://avatar-video-ai.com/:splat     3
 /fr/blog/mise-a-jour-heygen-2025        /fr/blog/mise-a-jour-heygen-2025.html    200
 /fr/blog/mise-a-jour-heygen-2025.html   /fr/blog/mise-a-jour-heygen-2025         301!
 
-# No other redirects. Articles keep their .html; hubs keep trailing slash via netlify.toml.
+# ES/DE: also 301 .html → canonical extensionless
+/es/privacy-policy                      /es/privacy-policy.html                  200
+/es/privacy-policy.html                 /es/privacy-policy                       301!
+/es/legal-notice                        /es/legal-notice.html                    200
+/es/legal-notice.html                   /es/legal-notice                         301!
+/es/blog/heygen-ai-review               /es/blog/heygen-ai-review.html           200
+/es/blog/heygen-ai-review.html          /es/blog/heygen-ai-review                301!
+/es/blog/heygen-update-2025             /es/blog/heygen-update-2025.html         200
+/es/blog/heygen-update-2025.html        /es/blog/heygen-update-2025              301!
+
+/de/privacy-policy                      /de/privacy-policy.html                  200
+/de/privacy-policy.html                 /de/privacy-policy                       301!
+/de/legal-notice                        /de/legal-notice.html                    200
+/de/legal-notice.html                   /de/legal-notice                         301!
+/de/blog/heygen-ai-review               /de/blog/heygen-ai-review.html           200
+/de/blog/heygen-ai-review.html          /de/blog/heygen-ai-review                301!
+/de/blog/heygen-update-2025             /de/blog/heygen-update-2025.html         200
+/de/blog/heygen-update-2025.html        /de/blog/heygen-update-2025              301!
+
+# No other redirects. Hubs keep trailing slash via netlify.toml.
