@@ -11,11 +11,13 @@ from typing import Iterable
 
 
 def _parse_int(value: str) -> int:
-    return int(value.strip().replace("\u00a0", "").replace(" ", ""))
+    cleaned = value.strip().replace("\u00a0", "").replace(" ", "")
+    return int(cleaned) if cleaned else 0
 
 
 def _parse_float(value: str) -> float:
-    return float(value.strip())
+    cleaned = value.strip().replace("\u00a0", "").replace(" ", "")
+    return float(cleaned) if cleaned else 0.0
 
 
 def _parse_pct(value: str) -> float:
@@ -340,4 +342,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
