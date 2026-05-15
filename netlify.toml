@@ -22,11 +22,16 @@ trailingSlash = "always"
 # Avoid redirect chains for `www` and HTTP by redirecting straight to the
 # canonical apex HTTPS host.
 [[redirects]]
-  from = "/*"
+  from = "http://www.avatar-video-ai.com/*"
   to = "https://avatar-video-ai.com/:splat"
   status = 301
   force = true
-  conditions = { Host = ["www.avatar-video-ai.com"] }
+
+[[redirects]]
+  from = "http://avatar-video-ai.com/*"
+  to = "https://avatar-video-ai.com/:splat"
+  status = 301
+  force = true
 
 ############################
 # Security & Privacy Headers
