@@ -81,4 +81,16 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://avatar-video-ai.com/de/privacy-policy"/>
 </url>
 
+
+  <!-- Blog article - HeyGen vs Synthesia -->
+  <url>
+    <loc>https://avatar-video-ai.com/de/blog/heygen-vs-synthesia</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://avatar-video-ai.com/blog/heygen-vs-synthesia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avatar-video-ai.com/blog/heygen-vs-synthesia"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://avatar-video-ai.com/fr/blog/heygen-vs-synthesia"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://avatar-video-ai.com/es/blog/heygen-vs-synthesia"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://avatar-video-ai.com/de/blog/heygen-vs-synthesia"/>
+</url>
 </urlset>
